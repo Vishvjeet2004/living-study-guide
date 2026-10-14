@@ -1,0 +1,128 @@
+# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# compiled output
+dist
+tmp
+out-tsc
+*.tsbuildinfo
+.expo
+.expo-shared
+
+# dependencies
+node_modules
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
+# System Files
+.DS_Store
+Thumbs.db
+
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md
+
+# Replit
+.cache/
+.local/
+
+# Private environment configuration and credentials (at any depth)
+.env
+.env.*
+*.env
+*.env.*
+.envrc
+.direnv/
+.ssh/
+.secrets/
+secrets/
+secrets.json
+secrets.yaml
+secrets.yml
+credentials/
+credentials.json
+service-account*.json
+service_account*.json
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_ed25519
+
+# Database dumps and private study-data exports
+*.sql
+*.sql.gz
+*.dump
+*.backup
+*.sqlite
+*.sqlite3
+*.db
+*.db-*
+backups/
+database-dumps/
+exports/
+user-data/
+private-data/
+uploads/
+attached_assets/
+study-state*.json
+study-data-backup*.json
+living-study-guide-backup*.json
+auth-state*.json
+storage-state*.json
+cookies.txt
+*.har
+*.heapsnapshot
+
+# Generated output, test artifacts, and runtime logs
+build/
+.next/
+.output/
+.turbo/
+.vite/
+.pnpm-store/
+*.log
+test-results/
+playwright-report/
+screenshots/
+generated-artifacts/
+
+# Local Library registration metadata may describe private generated assets.
+.agents/agent_assets_metadata.toml
+
+# Public source-upload exclusions. Already tracked files/history are unaffected;
+# use the reviewed source-only upload manifest, not the existing branch history.
+/.agents/
+/artifacts/mockup-sandbox/
+**/.replit-artifact/
+/.replit
+/.replitignore
+/replit.md
+/scripts/
+**/.gitkeep

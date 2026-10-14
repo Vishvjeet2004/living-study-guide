@@ -1,0 +1,257 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: study
+    description: Authenticated study-state storage
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /study-state:
+    get:
+      operationId: loadStudyState
+      tags: [study]
+      summary: Load the signed-in user's study state
+      responses:
+        "200":
+          description: Existing study state, or null when the account has not been initialized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyStateLoadResponse"
+        "401":
+          description: Sign-in required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: migrateStudyState
+      tags: [study]
+      summary: Initialize study state without overwriting an existing record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyStateMigrationInput"
+      responses:
+        "200":
+          description: Current state after safe one-time initialization
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyStateMigrationResponse"
+        "400":
+          description: Invalid study-state payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Sign-in required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: saveStudyState
+      tags: [study]
+      summary: Save the signed-in user's study state
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyStateUpdateInput"
+      responses:
+        "200":
+          description: Saved study state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyStateSaveResponse"
+        "400":
+          description: Invalid study-state payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Sign-in required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: State has not been initialized for this account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    StudyActivity:
+      type: object
+      properties:
+        day:
+          type: string
+        count:
+          type: integer
+          minimum: 0
+      required: [day, count]
+    StudySettings:
+      type: object
+      properties:
+        dailyGoal:
+          type: integer
+          minimum: 1
+        reducedMotion:
+          type: boolean
+      required: [dailyGoal, reducedMotion]
+    StudyDraft:
+      type: object
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+          enum: [flashcard, quiz]
+        topic:
+          type: string
+        prompt:
+          type: string
+        answer:
+          type: string
+        choices:
+          type: array
+          items:
+            type: string
+        correctIndex:
+          type: integer
+          minimum: 0
+        excerpt:
+          type: string
+        sourceNoteId:
+          type: string
+      required: [id, kind, topic, prompt, answer, choices, correctIndex, excerpt, sourceNoteId]
+    StudyFlashcard:
+      type: object
+      properties:
+        id:
+          type: string
+        topic:
+          type: string
+        prompt:
+          type: string
+        answer:
+          type: string
+        sourceNoteId:
+          type: string
+        excerpt:
+          type: string
+      required: [id, topic, prompt, answer, sourceNoteId, excerpt]
+    StudyState:
+      type: object
+      properties:
+        drafts:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudyDraft"
+        cards:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudyFlashcard"
+        quizzes:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudyDraft"
+        sessions:
+          type: integer
+          minimum: 0
+        correct:
+          type: integer
+          minimum: 0
+        activity:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudyActivity"
+        settings:
+          $ref: "#/components/schemas/StudySettings"
+      required: [drafts, cards, quizzes, sessions, correct, activity, settings]
+    StudyStateLoadResponse:
+      type: object
+      properties:
+        state:
+          anyOf:
+            - $ref: "#/components/schemas/StudyState"
+            - type: "null"
+        updatedAt:
+          type: ["string", "null"]
+          format: date-time
+      required: [state, updatedAt]
+    StudyStateMigrationInput:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/StudyState"
+      required: [state]
+    StudyStateUpdateInput:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/StudyState"
+      required: [state]
+    StudyStateSaveResponse:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/StudyState"
+        updatedAt:
+          type: string
+          format: date-time
+      required: [state, updatedAt]
+    StudyStateMigrationResponse:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/StudyState"
+        updatedAt:
+          type: string
+          format: date-time
+        migrated:
+          type: boolean
+      required: [state, updatedAt, migrated]
+
